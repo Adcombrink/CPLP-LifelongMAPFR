@@ -1,5 +1,9 @@
 # Continuous-time Prioritized Lifelong Planner
 
-<video src="./assets/ct-LMAPF_2025-03-11_17-44-22.mp4" controls="controls" style="max-width: 100%; height: auto;">
-  Your browser does not support the video tag.
-</video>
+<div style="text-align: center;">
+  <img src="https://github.com/user-attachments/assets/1262c8d1-1cab-4d9b-9838-46e209985668" width="400">
+</div>
+
+
+
+
