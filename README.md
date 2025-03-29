@@ -4,7 +4,7 @@
 <br>
 
 <p align="center">
-  Alvin Combrink, Stephie Do, Kristofer Bengtsson, Sabino Franceso Roselli, and Martin Fabian.
+  Alvin Combrink, Sabino Franceso Roselli, and Martin Fabian.
 </p>
 <br>
 <br>
