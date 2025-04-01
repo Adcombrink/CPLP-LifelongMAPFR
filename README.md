@@ -8,9 +8,15 @@
 </p>
 <br>
 <br>
-<div style="text-align: center;">
-  <img src="https://github.com/user-attachments/assets/ff1a58d8-1cb6-4d22-b0fd-753a2656581f" width="400">
+<div align="center">
+  <p>
+    <img src="https://github.com/user-attachments/assets/ab9d7369-8d4d-49c3-b403-50ad443a0d0b" width="30%" hspace="10">
+    <img src="https://github.com/user-attachments/assets/411516e1-1c79-46c5-be17-ca8793d5c2b4" width="30%" hspace="10">
+    <img src="https://github.com/user-attachments/assets/5fa743b3-3f2f-42d1-89c3-49c8322423aa" width="30%" hspace="10">
+  </p>
 </div>
+
+
 
 <br> 
 
