@@ -33,13 +33,11 @@ _This work addresses continuous-time lifelong MAPF with agent volumes by present
 
 ```
 ├── src/                           # Source code for the project
-│   ├── Results/                   # Results from solver runs
-│   ├── Scheduling_Problems        # Problem instance generators
+│   ├── Benchmark_Sets/            # Benchmark sets, continaining instances to test the algorithm
+│   ├── Benchmark_Results/         # Benchmark results, follows the same file structure as Benchmark_Sets
+│   ├── Infeasible_Instances       # Contains infeasible instances found during benchmarking.
 │   ├── Plots/                     # Result plots
 │   ├── requirements.txt           # Required Python libraries and dependencies
-├── docs/
-│   ├── AppendixFormulations.pdf   # Appendix: Details on the SMT and MILP generic constraint formulations.
-│   ├── AppendixExperiments.pdf    # Appendix: Details on the experimental evaluation.
 ├── README.md                      # Project documentation (this file)
 └── LICENSE                        # License information
 ```
