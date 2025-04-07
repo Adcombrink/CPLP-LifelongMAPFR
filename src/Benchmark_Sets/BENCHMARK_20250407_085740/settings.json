@@ -1,0 +1,92 @@
+{
+    "set_0": {
+        "n_agents": 10,
+        "n_vertices": 50,
+        "n_tasks": 100,
+        "end_time": 200,
+        "space_size": [
+            21.213203435596427,
+            21.213203435596427
+        ]
+    },
+    "set_1": {
+        "n_agents": 25,
+        "n_vertices": 125,
+        "n_tasks": 250,
+        "end_time": 200,
+        "space_size": [
+            33.54101966249685,
+            33.54101966249685
+        ]
+    },
+    "set_2": {
+        "n_agents": 50,
+        "n_vertices": 250,
+        "n_tasks": 500,
+        "end_time": 200,
+        "space_size": [
+            47.43416490252569,
+            47.43416490252569
+        ]
+    },
+    "set_3": {
+        "n_agents": 10,
+        "n_vertices": 100,
+        "n_tasks": 100,
+        "end_time": 200,
+        "space_size": [
+            30.0,
+            30.0
+        ]
+    },
+    "set_4": {
+        "n_agents": 25,
+        "n_vertices": 250,
+        "n_tasks": 250,
+        "end_time": 200,
+        "space_size": [
+            47.43416490252569,
+            47.43416490252569
+        ]
+    },
+    "set_5": {
+        "n_agents": 50,
+        "n_vertices": 500,
+        "n_tasks": 500,
+        "end_time": 200,
+        "space_size": [
+            67.0820393249937,
+            67.0820393249937
+        ]
+    },
+    "set_6": {
+        "n_agents": 10,
+        "n_vertices": 150,
+        "n_tasks": 100,
+        "end_time": 200,
+        "space_size": [
+            36.742346141747674,
+            36.742346141747674
+        ]
+    },
+    "set_7": {
+        "n_agents": 25,
+        "n_vertices": 375,
+        "n_tasks": 250,
+        "end_time": 200,
+        "space_size": [
+            58.09475019311125,
+            58.09475019311125
+        ]
+    },
+    "set_8": {
+        "n_agents": 50,
+        "n_vertices": 750,
+        "n_tasks": 500,
+        "end_time": 200,
+        "space_size": [
+            82.15838362577492,
+            82.15838362577492
+        ]
+    }
+}
