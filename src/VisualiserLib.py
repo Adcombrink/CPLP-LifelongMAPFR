@@ -278,19 +278,6 @@ def plot_graph(graph, agent_start, agent_radius):
     # nodes
     for v in graph.nodes:
         pos = nx.get_node_attributes(graph, 'pos')
-        """
-        if v in ['v1534']:
-            ax.add_patch(
-                Circle(pos[v], 5, facecolor='magenta', edgecolor=None, alpha=0.2)
-            )
-            ax.add_patch(
-                Circle(pos[v], 3, facecolor='magenta', edgecolor=None, alpha=0.2)
-            )
-            ax.add_patch(
-                Circle(pos[v], 0.5, facecolor='magenta', edgecolor=None, alpha=1)
-            )
-        else:
-        """
         ax.add_patch(
             Circle(pos[v], node_size, facecolor=graph_color, edgecolor=None)
         )

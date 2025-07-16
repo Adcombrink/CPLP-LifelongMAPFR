@@ -298,20 +298,20 @@ def plot_gpp_time(settings, results_stats, output_folder):
     avg_gpp_times = [sum(vertex_to_gpp_times[v]) / len(vertex_to_gpp_times[v]) / 60  # sec to min
                      for v in unique_vertices]
 
-    plt.figure(figsize=(4, 1.7))
+    plt.figure(figsize=(4, 1.3))
     color = plt.cm.magma(0.5)
 
     plt.plot(
         unique_vertices,
         avg_gpp_times,
         color=color,
-        linewidth=2.5,
+        linewidth=1.5,
         marker='o',
-        markersize=6
+        markersize=4
     )
 
     plt.xlabel("Number of Vertices", fontsize=10)
-    plt.ylabel("Time (minutes)", fontsize=10)
+    plt.ylabel("Time", fontsize=10)
     plt.tick_params(axis='both', which='major', labelsize=8)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -323,45 +323,66 @@ def plot_gpp_time(settings, results_stats, output_folder):
 
 def plot_combined_metrics(ratio_data, ratios, colors, output_folder):
     """Creates a single figure with 3 subplots for computation time metrics."""
-    fig, axs = plt.subplots(2, 1, figsize=(4, 4), sharex=True, gridspec_kw={'height_ratios': [2, 1]})
+    fig, axs = plt.subplots(2, 1, figsize=(4, 3.5), sharex=True, gridspec_kw={'height_ratios': [3, 1]})
 
     # Plot computation time (top subplot)
+    number_of_agents = set()
     for i, ratio in enumerate(ratios):
         idx = sorted(range(len(ratio_data[ratio]['n_agents'])),
                      key=lambda k: ratio_data[ratio]['n_agents'][k])
 
         n_agents = [ratio_data[ratio]['n_agents'][j] for j in idx]
-        planning_comp_time_ms = [ratio_data[ratio]['planning_comp_time']['mean'][j] * 1000
+        number_of_agents.update(n_agents)
+        planning_comp_time_ms = [ratio_data[ratio]['planning_comp_time']['mean'][j]
                                  for j in idx]
-        planning_comp_time_std_ms = [ratio_data[ratio]['planning_comp_time']['std'][j] * 1000
-                                     for j in idx]
-
-        # Plot mean line
         axs[0].plot(
             n_agents,
             planning_comp_time_ms,
             color=colors[i],
             linewidth=1.5,
-            label=f'$\\rho$ = {int(ratio)}',
+            label=f'$\\rho$ = {int(ratio)}, avg',
             marker='o',
             markersize=4
         )
+    margin = [max(na ** 1.25, 500)/1000 for na in n_agents]
+    axs[0].plot(
+        n_agents,
+        margin,
+        color='black',
+        linestyle='--',
+        linewidth=1,
+        label=f'$\\Delta t$'
+    )
+    for i, ratio in enumerate(ratios):
+        idx = sorted(range(len(ratio_data[ratio]['n_agents'])),
+                     key=lambda k: ratio_data[ratio]['n_agents'][k])
 
-        # Add fill between for standard deviation
-        """
-        axs[0].fill_between(
+        n_agents = [ratio_data[ratio]['n_agents'][j] for j in idx]
+        number_of_agents.update(n_agents)
+        planning_comp_time_max_ms = [ratio_data[ratio]['planning_comp_time']['max'][j]
+                                 for j in idx]
+        axs[0].plot(
             n_agents,
-            [max(0, mean - std) for mean, std in zip(planning_comp_time_ms, planning_comp_time_std_ms)],
-            [mean + std for mean, std in zip(planning_comp_time_ms, planning_comp_time_std_ms)],
+            planning_comp_time_max_ms,
             color=colors[i],
-            alpha=0.2
+            linewidth=1,
+            label=f'$\\rho$ = {int(ratio)}, max',
+            marker='o',
+            markersize=3
         )
-        """
 
-    axs[0].set_ylabel("Time (milliseconds)", fontsize=10)
+
+    axs[0].set_ylabel("Time (seconds)", fontsize=10)
     axs[0].tick_params(axis='both', which='major', labelsize=8)
-    axs[0].legend(fontsize=8)
     axs[0].grid(True, alpha=0.3)
+    axs[0].set_yscale('log')
+    # advanced legend
+    handles, labels = axs[0].get_legend_handles_labels()
+    first_legend = axs[0].legend(handles[:3], labels[:3], fontsize=8,
+                                 loc='lower left', bbox_to_anchor=(0.3, 0.0))
+    axs[0].add_artist(first_legend)
+    second_legend = axs[0].legend(handles[3:7], labels[3:7], fontsize=8,
+                                  loc='lower right', bbox_to_anchor=(0.99, 0.0))
 
     # Plot throughput ratio (bottom subplot - now half height)
     for i, ratio in enumerate(ratios):
@@ -384,8 +405,9 @@ def plot_combined_metrics(ratio_data, ratios, colors, output_folder):
     axs[1].set_xlabel("Number of Agents", fontsize=10)
     axs[1].set_ylabel("Throughput (%)", fontsize=10)
     axs[1].tick_params(axis='both', which='major', labelsize=8)
-    axs[1].legend(fontsize=8)
+    axs[1].legend(fontsize=8, ncols=3, loc='upper right')
     axs[1].grid(True, alpha=0.3)
+    axs[1].yaxis.get_major_locator().set_params(integer=True)
 
     plt.tight_layout()
 
@@ -495,7 +517,7 @@ def compute_and_plot(results_folder, benchmark_folder, output_file_path):
 if __name__ == '__main__':
 
     # Define the folder paths
-    results_folder = 'Benchmark_Results/BENCHMARK_all_results'
+    results_folder = 'Benchmark_Results/BENCHMARK_all_sets_20250507_180240'
     benchmark_folder = 'Benchmark_Sets/BENCHMARK_all_sets'
     output_file_path = os.path.join(results_folder, 'stats.json')
 

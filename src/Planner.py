@@ -111,7 +111,8 @@ class CPLP:
                     # calculate lower-bound arrival time for each agent to task (if not done already)
                     if task not in agent_task_arrival_times:
                         agent_task_arrival_times[task] = sorted(list(self.agents), key=lambda
-                            agent: self.agent_last_point[agent][1] + self.dist[self.agent_last_point[agent][0]][task[0]])
+                            agent: self.agent_last_point[agent][1] + self.dist[self.agent_last_point[agent][0]][
+                            task[0]])
 
                     # agent to check
                     agent = agent_task_arrival_times[task][i_agent]
@@ -119,7 +120,7 @@ class CPLP:
                     # try to find a path for agent to task
                     self.agent_to_task[agent] = task
                     self.task_to_agent[task] = agent
-                    
+
                     # search for plan
                     plans = self.CCBS_modified(agent)
 
@@ -142,7 +143,7 @@ class CPLP:
                 if found_path is True:
                     break
 
-            if self.hpt_end_time <=  curr_time:
+            if self.hpt_end_time <= curr_time:
                 print(f' ------------ Failed to find HPT/HPA path. Tasks {self.task_set}')
 
         # Update assignments
@@ -151,12 +152,13 @@ class CPLP:
         # Do short planning for remaining agents (SIPP)
         remaining_tasks = self.task_set - {self.hpt} - set(self.task_to_agent)
         planned_completed_tasks = set() if self.hpt is None else {self.hpt}
+
         def plan_short_paths():
 
             agents_by_task_priority = sorted([(agent, task) for task, agent in self.task_to_agent.items()
                                               if agent != self.hpa and self.agent_last_point[agent][0] != task[0]],
                                              key=lambda item: self.task_priorities[item[1]], reverse=True)
-            for agent,_ in agents_by_task_priority:
+            for agent, _ in agents_by_task_priority:
                 while self.agent_last_point[agent][1] <= curr_time + self.min_SIPP_horizon:
                     # and self.agent_last_point[agent][0] != self.agent_to_task[agent][0]:
 
@@ -184,12 +186,13 @@ class CPLP:
                     )
 
                     if plan is not None:
-                        plan = plan[:-1] # remove last infinite wait action
+                        plan = plan[:-1]  # remove last infinite wait action
                         self.update_with_plans({agent: plan})
                         self.log['Plan'][curr_time]['SIPP'].setdefault(agent, []).extend(plan)
                     else:
                         break
-        #plan_short_paths()
+
+        # plan_short_paths()
 
         # Do random planning if CCBS failed
         def random_short_paths():
@@ -197,7 +200,7 @@ class CPLP:
             for agent in self.agents:
 
                 random_vertex = random.choice(list(self.graph.nodes))
-                while self.agent_last_point[agent][1] <= curr_time + self.min_SIPP_horizon\
+                while self.agent_last_point[agent][1] <= curr_time + self.min_SIPP_horizon \
                         and self.agent_last_point[agent][0] != random_vertex:
 
                     # get a short path from the agent's current point to a node that is closer to its task and not
@@ -216,6 +219,7 @@ class CPLP:
                         self.log['Plan'][curr_time]['SIPP'].setdefault(agent, []).extend(plan)
                     else:
                         break
+
         if found_new_path is False:
             random_short_paths()
             print(f' ------------ Randomise paths:')
@@ -318,11 +322,13 @@ class CPLP:
                             unsafe_interval = (t + tau0, t + tau1)
 
                             for other_a, other_t0, other_t1 in action_lookup[v]:
-                                if other_a != a and intervals_overlap(unsafe_interval[0], unsafe_interval[1], other_t0, other_t1):
+                                if other_a != a and intervals_overlap(unsafe_interval[0], unsafe_interval[1], other_t0,
+                                                                      other_t1):
 
                                     if other_t1 == np.inf:
                                         if (preliminary_collision is None
-                                                or min(other_t0, t) < min(preliminary_collision[0][2], preliminary_collision[1][2])):
+                                                or min(other_t0, t) < min(preliminary_collision[0][2],
+                                                                          preliminary_collision[1][2])):
                                             preliminary_collision = ((other_a, v, other_t0, other_t1), (a, e, t))
                                     else:
                                         return ((other_a, v, other_t0, other_t1), (a, e, t))
@@ -332,7 +338,8 @@ class CPLP:
                             unsafe_interval = (t + tau0, t + tau1)
 
                             for other_a, other_t in action_lookup[e_]:
-                                if other_a != a and intervals_overlap(unsafe_interval[0], unsafe_interval[1], other_t, other_t):
+                                if other_a != a and intervals_overlap(unsafe_interval[0], unsafe_interval[1], other_t,
+                                                                      other_t):
                                     return ((a, e, t), (other_a, e_, other_t))
 
                         # add action to lookup
@@ -346,11 +353,13 @@ class CPLP:
                             unsafe_interval = (t0 + tau0, t1 + tau1)
 
                             for other_a, other_t in action_lookup[e]:
-                                if other_a != a and intervals_overlap(unsafe_interval[0], unsafe_interval[1], other_t, other_t):
+                                if other_a != a and intervals_overlap(unsafe_interval[0], unsafe_interval[1], other_t,
+                                                                      other_t):
 
                                     if t1 == np.inf:
                                         if (preliminary_collision is None
-                                                or min(t0, other_t) < min(preliminary_collision[0][2], preliminary_collision[1][2])):
+                                                or min(t0, other_t) < min(preliminary_collision[0][2],
+                                                                          preliminary_collision[1][2])):
                                             preliminary_collision = ((a, v, t0, t1), (other_a, e, other_t))
                                     else:
                                         return ((a, v, t0, t1), (other_a, e, other_t))
@@ -432,7 +441,8 @@ class CPLP:
                 for existing_constraint in list(constraints[a]):
                     if existing_constraint[0] == c[1]:
                         if existing_constraint[1][0] <= c[2][1] and existing_constraint[1][1] >= c[2][0]:
-                            replacement_constraint = (c[1], (min(existing_constraint[1][0], c[2][0]), max(existing_constraint[1][1], c[2][1])))
+                            replacement_constraint = (
+                            c[1], (min(existing_constraint[1][0], c[2][0]), max(existing_constraint[1][1], c[2][1])))
                             constraints[a].remove(existing_constraint)
                 if replacement_constraint is not None:
                     constraints[a].add(replacement_constraint)
@@ -497,7 +507,7 @@ class CPLP:
                 self.cost = cost
                 self.plans = plans
                 self.constraints = constraints
-                self.collision_type = collision_type # EE: edge-edge, VE: vertex-edge collision, VE-inf: vertex-edge collision with infinite wait
+                self.collision_type = collision_type  # EE: edge-edge, VE: vertex-edge collision, VE-inf: vertex-edge collision with infinite wait
 
             def __lt__(self, other):
 
@@ -582,7 +592,8 @@ class CPLP:
 
                         idle_agent = collision[0][0]
                         if idle_agent in node.constraints:
-                            modified_unsafe_intervals = modify_unsafe_intervals_with_constraints(node.constraints[idle_agent])
+                            modified_unsafe_intervals = modify_unsafe_intervals_with_constraints(
+                                node.constraints[idle_agent])
                         else:
                             modified_unsafe_intervals = self.unsafe_intervals
                         new_path = self.SIPP(node.plans[idle_agent][-1][1],
@@ -754,7 +765,8 @@ class CPLP:
                     # If the new value is lower, update it. However, if the start vertex must be left, then we must be
                     # able to update the root node.
                     if (next_node_f < nodes[next_node_label].f
-                            or (end_vertex is None and nodes[next_node_label] == root and nodes[next_node_label].parent_node is None)):
+                            or (end_vertex is None and nodes[next_node_label] == root and nodes[
+                                next_node_label].parent_node is None)):
                         nodes[next_node_label].f = next_node_f
                         nodes[next_node_label].arrival_time = next_node_arrival_time
                         nodes[next_node_label].parent_edge = edge
@@ -762,7 +774,8 @@ class CPLP:
                         heapq.heappush(queue, nodes[next_node_label])
 
                 else:
-                    next_node = Node(edge[1], next_node_interval, next_node_goal_reached, next_node_f, next_node_arrival_time, edge, node)
+                    next_node = Node(edge[1], next_node_interval, next_node_goal_reached, next_node_f,
+                                     next_node_arrival_time, edge, node)
                     nodes[next_node_label] = next_node
                     heapq.heappush(queue, next_node)
 
@@ -853,7 +866,8 @@ class CPLP:
 
                     # update vertex utilisation
                     if e[1] in self.vertex_utilisation:
-                        self.vertex_utilisation[e[1]] = self.insert_interval(self.vertex_utilisation[e[1]], (arrival_time, arrival_time))
+                        self.vertex_utilisation[e[1]] = self.insert_interval(self.vertex_utilisation[e[1]],
+                                                                             (arrival_time, arrival_time))
                     else:
                         self.vertex_utilisation[e[1]] = [(arrival_time, arrival_time)]
 
@@ -912,7 +926,9 @@ class CPLP:
                 continue
             if not assignable_agents:
                 break
-            arrival_times = {agent: self.agent_last_point[agent][1] + self.dist[self.agent_last_point[agent][0]][task[0]] for agent in assignable_agents}
+            arrival_times = {
+                agent: self.agent_last_point[agent][1] + self.dist[self.agent_last_point[agent][0]][task[0]] for agent
+                in assignable_agents}
             agent = min(arrival_times, key=lambda x: arrival_times[x])
             assigned_tasks[agent] = task
             assignable_agents.remove(agent)
@@ -996,7 +1012,7 @@ class CPLP:
 
         # update affected edges
         for e, (tau0, tau1) in self.E_vec[v].items():
-            self.unsafe_intervals[e] = self.insert_interval(self.unsafe_intervals[e],(t0 + tau0, t1 + tau1))
+            self.unsafe_intervals[e] = self.insert_interval(self.unsafe_intervals[e], (t0 + tau0, t1 + tau1))
 
         # update affected vertices
         # for v_ in self.V_vvc[v]:
@@ -1058,7 +1074,8 @@ class CPLP:
             si_end = np.inf if i + 1 >= len(unsafe_intervals) else unsafe_intervals[i + 1][0]
             lower_intersection = max(si_start, interval[0])
             upper_intersection = min(si_end, interval[1])
-            if round(lower_intersection, 5) <= round(upper_intersection, 5) and lower_intersection < np.inf and -np.inf < upper_intersection:
+            if round(lower_intersection, 5) <= round(upper_intersection,
+                                                     5) and lower_intersection < np.inf and -np.inf < upper_intersection:
                 safe_intervals.append((si_start, si_end))
 
             i += 1
@@ -1083,12 +1100,13 @@ class CPLP:
         successors = set()
         for e in self.graph.out_edges(v):
 
-            Je = self.intersected_safe_intervals(unsafe_intervals[e], interval)                 # all reachable intervals on e
+            Je = self.intersected_safe_intervals(unsafe_intervals[e], interval)  # all reachable intervals on e
 
             for tau0, tau1 in Je:
-                t0_, t1_ = max(tau0, interval[0]), min(tau1, interval[1])                       # possible time to traverse e
-                s0, s1 = t0_ + self.edge_weight(e), t1_ + self.edge_weight(e)                   # possible arrival time at next vertex
-                Ju = self.intersected_safe_intervals(unsafe_intervals[e[1]], (s0, s1))  # all reachable intervals at next vertex
+                t0_, t1_ = max(tau0, interval[0]), min(tau1, interval[1])  # possible time to traverse e
+                s0, s1 = t0_ + self.edge_weight(e), t1_ + self.edge_weight(e)  # possible arrival time at next vertex
+                Ju = self.intersected_safe_intervals(unsafe_intervals[e[1]],
+                                                     (s0, s1))  # all reachable intervals at next vertex
 
                 for tau0_, tau1_ in Ju:
                     s0_, s1_ = max(tau0_, s0), min(tau1_, s1)

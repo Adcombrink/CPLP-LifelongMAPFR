@@ -69,7 +69,9 @@ def run_instance(instance, agent_radius, agent_speed, timelimit=None):
 
     print('\t\tPerforming online planning')
     i_task = 0
-    curr_time = 0
+    nr_agents = len(agents)
+    curr_time = tasks[0][1]                     # time of first task
+    Delta = max(nr_agents ** 1.25, 500) / 1000  # how far in the future new plans start
     while i_task < len(tasks) or planner.task_set:
 
         if timelimit is not None and time.time() - t0_planning > timelimit:
@@ -77,47 +79,44 @@ def run_instance(instance, agent_radius, agent_speed, timelimit=None):
 
         # get new tasks released at time
         new_tasks = set()
-        while i_task < len(tasks) and tasks[i_task][1] == curr_time:
+        while i_task < len(tasks) and tasks[i_task][1] <= curr_time:
             new_tasks.add(tasks[i_task])
             i_task += 1
 
-        # planner.add_task(tasks[i_task])
-        # next_comp_time = planner.plan(curr_time, new_tasks)
+        plan_start_time = curr_time + Delta
         try:
             t0 = time.time()
-            next_comp_time = planner.plan(curr_time, new_tasks)
+            plan_end_time = planner.plan(plan_start_time, new_tasks)
             stats['Planning computation'].append(time.time() - t0)
             stats['Planning horizon'].append(
-                next_comp_time - curr_time if next_comp_time is not None else None)
+                plan_end_time - plan_start_time if plan_end_time is not None else None)
         except:
             print('\t\tFailed')
             stats['Status'] = 'Failed'
             break
 
 
-        if next_comp_time is not None:
-            next_time_step = min(next_comp_time, tasks[i_task][1]) if i_task < len(tasks) else next_comp_time
+        if plan_end_time is not None:
+            next_curr_time = plan_end_time - Delta
         else:
 
-            # if planner returns "no more planning" but there are still tasks left, Failed
+            # if planner returns "planning done" but there are still tasks left, Failed
             if planner.task_set:
                 stats['Status'] = 'Failed'
                 break
 
-            # planner is done with all tasks, if there are still task to release, do so, else done
+            # planner is done with all tasks, if there are still tasks to release, do so, else done
             if i_task < len(tasks):
-                next_time_step = tasks[i_task][1]
+                next_curr_time = tasks[i_task][1]
             else:
                 stats['Status'] = 'Completed'
                 break
 
-        curr_time = next_time_step
+        curr_time = next_curr_time
 
     stats['Planning'] = time.time() - t0_planning
     print(f'\t\tDone ({stats["Planning"]:.6f} s) Remaining tasks {len(planner.task_set)}')
     stats['Planner log'] = planner.log
-
-    # VisualiserLib.animate_MAPF(graph, planner.plans, agent_start, agent_speed, agent_radius, fps=10, time_scale=1)
 
     return stats, planner
 
@@ -142,18 +141,38 @@ def run_benchmark_set(benchmark_label):
     output_folder = os.path.join('Benchmark_Results', benchmark_label + f'_{current_datetime}')
     os.makedirs(output_folder, exist_ok=True)
 
-    benchmark_sets = EnvironmentLib.load_benchmark_sets(benchmark_folder)
-    for i_set, (instance_set_label, instance_set) in enumerate(benchmark_sets.items()):
+    # Get instance paths
+    sets_folder = os.path.join(benchmark_folder, "sets")
+    sets = dict()
+    for set_folder in os.listdir(sets_folder):
+        if set_folder.endswith('.DS_Store'):
+            continue
 
-        set_folder = os.path.join(output_folder, 'sets', instance_set_label)
+        sets[set_folder] = dict()
+
+        set_path = os.path.join(sets_folder, set_folder)
+        for instance_label in os.listdir(set_path):
+            if instance_label.endswith('.DS_Store'):
+                continue
+            sets[set_folder][instance_label] = os.path.join(set_path, instance_label)
+
+    for i_set, set_label in enumerate(sets):
+        print(f'Running \t{set_label} ({i_set+1}/{len(sets)}) ########################')
+        set_folder = os.path.join(output_folder, 'sets', set_label)
         os.makedirs(set_folder, exist_ok=True)
 
-        for i_instance, (instance_label, instance) in enumerate(instance_set.items()):
-            print(f"Running ({i_set + 1}/{len(benchmark_sets)}, {i_instance + 1}/{len(instance_set)}): {instance_set_label} {instance_label}")
+        for i_instance, (instance_label, instance_path) in enumerate(sets[set_label].items()):
+            print(f'\t{instance_label} ({i_instance+1}/{len(sets[set_label])}) ---------------------')
+
+            # load and run instance
+            instance = EnvironmentLib.load_instance_from_json(instance_path)
             stats, _ = run_instance(instance, agent_radius=1, agent_speed=1)
 
-            with open(os.path.join(set_folder, f"{instance_label}.json"), "w") as stats_file:
+            # save instance
+            with open(os.path.join(set_folder, f"{instance_label}"), "w") as stats_file:
                 json.dump(stats, stats_file, indent=4)
+
+    print('Done')
 
 
 def worker_run_instance(task):
