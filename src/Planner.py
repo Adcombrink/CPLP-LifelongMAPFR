@@ -10,10 +10,10 @@ import random
 
 class CPLP:
 
-    def __init__(self, graph, agents, agent_start, V_vvc, V_vec, E_vec, E_eec, dist):
+    def __init__(self, graph, agents, agent_start, horizon, V_vvc, V_vec, E_vec, E_eec, dist):
 
         # Params
-        self.min_SIPP_horizon = 1
+        self.min_SIPP_horizon = horizon
         self.CCBS_time_limit = 0.025
 
         # Graph
@@ -100,8 +100,8 @@ class CPLP:
         found_new_path = None
         if self.hpt_end_time <= curr_time:
 
-            # search for a path from an agent to a task 
-            # looks for the 1st nearest agent to each task in order of priority, then the 2nd nearest agent, etc. 
+            # search for a path from an agent to a task
+            # looks for the 1st nearest agent to each task in order of priority, then the 2nd nearest agent, etc.
             agent_task_arrival_times = dict()
             tasks_by_priority = sorted(self.task_priorities.keys(), key=lambda item: self.task_priorities[item])
             found_path = False

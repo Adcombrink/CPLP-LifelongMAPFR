@@ -344,7 +344,7 @@ def plot_combined_metrics(ratio_data, ratios, colors, output_folder):
             marker='o',
             markersize=4
         )
-    margin = [max(na ** 1.25, 500)/1000 for na in n_agents]
+    margin = [max(na ** 1.5, 100)/1000 for na in n_agents]
     axs[0].plot(
         n_agents,
         margin,
@@ -402,6 +402,7 @@ def plot_combined_metrics(ratio_data, ratios, colors, output_folder):
             label=f'$\\rho$ = {int(ratio)}'
         )
 
+    axs[1].set_ylim(95, 110)
     axs[1].set_xlabel("Number of Agents", fontsize=10)
     axs[1].set_ylabel("Throughput (%)", fontsize=10)
     axs[1].tick_params(axis='both', which='major', labelsize=8)
@@ -434,7 +435,7 @@ def compute_and_plot(results_folder, benchmark_folder, output_file_path):
     for set_folder in sorted([folder for folder in os.listdir(results_folder + '/sets') if not folder.startswith('.')]):
         set_folder_path = os.path.join(results_folder, 'sets', set_folder)
 
-        result_files = sorted(os.listdir(set_folder_path))
+        result_files = sorted([file for file in os.listdir(set_folder_path) if file.endswith(".json")])
 
         # Initialize lists to collect metrics for this set
         gpp_times = []
@@ -448,9 +449,6 @@ def compute_and_plot(results_folder, benchmark_folder, output_file_path):
 
         for result_file in result_files:
             result_file_path = os.path.join(set_folder_path, result_file)
-
-            if not result_file.endswith(".json"):
-                continue
 
             # Load the stats file
             with open(result_file_path, "r") as f:
@@ -517,8 +515,8 @@ def compute_and_plot(results_folder, benchmark_folder, output_file_path):
 if __name__ == '__main__':
 
     # Define the folder paths
-    results_folder = 'Benchmark_Results/BENCHMARK_all_sets_20250507_180240'
-    benchmark_folder = 'Benchmark_Sets/BENCHMARK_all_sets'
+    results_folder = 'Benchmark_Results/All_instances_20251110_171940'
+    benchmark_folder = 'Benchmark_Sets/All_instances'
     output_file_path = os.path.join(results_folder, 'stats.json')
 
     # Compute and plot statistics over a benchmark set's results

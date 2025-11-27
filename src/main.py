@@ -1,7 +1,6 @@
 from Planner import CPLP
-from GraphPreProcessing import GraphPreProcessor
-from ResultStatisticsLib import compute_and_plot
 import EnvironmentLib
+from GraphPreProcessing import GraphPreProcessor
 import VisualiserLib
 import time
 import datetime
@@ -9,6 +8,7 @@ import os
 import json
 import multiprocessing as mp
 import traceback
+import numpy as np
 
 
 def run_instance(instance, agent_radius, agent_speed, timelimit=None):
@@ -65,13 +65,15 @@ def run_instance(instance, agent_radius, agent_speed, timelimit=None):
 
     print('\t\tInitialising planner')
     agents = set(agent_start.keys())
-    planner = CPLP(graph, agents, agent_start, gpp.V_vvc, gpp.V_vec, gpp.E_vec, gpp.E_eec, gpp.dist)
 
     print('\t\tPerforming online planning')
     i_task = 0
     nr_agents = len(agents)
     curr_time = tasks[0][1]                     # time of first task
-    Delta = max(nr_agents ** 1.25, 500) / 1000  # how far in the future new plans start
+    Delta = max(nr_agents ** 1.5, 100) / 1000  # how far in the future new plans start
+    horizon = 1 * Delta
+
+    planner = CPLP(graph, agents, agent_start, horizon, gpp.V_vvc, gpp.V_vec, gpp.E_vec, gpp.E_eec, gpp.dist)
     while i_task < len(tasks) or planner.task_set:
 
         if timelimit is not None and time.time() - t0_planning > timelimit:
@@ -87,7 +89,8 @@ def run_instance(instance, agent_radius, agent_speed, timelimit=None):
         try:
             t0 = time.time()
             plan_end_time = planner.plan(plan_start_time, new_tasks)
-            stats['Planning computation'].append(time.time() - t0)
+            comp_time = time.time() - t0
+            stats['Planning computation'].append(comp_time)
             stats['Planning horizon'].append(
                 plan_end_time - plan_start_time if plan_end_time is not None else None)
         except:
@@ -95,9 +98,9 @@ def run_instance(instance, agent_radius, agent_speed, timelimit=None):
             stats['Status'] = 'Failed'
             break
 
-
         if plan_end_time is not None:
-            next_curr_time = plan_end_time - Delta
+            next_curr_time = max(plan_end_time - Delta, curr_time + comp_time)
+            # next_time_step = min(plan_end_time, tasks[i_task][1]) if i_task < len(tasks) else plan_end_time
         else:
 
             # if planner returns "planning done" but there are still tasks left, Failed
@@ -107,7 +110,7 @@ def run_instance(instance, agent_radius, agent_speed, timelimit=None):
 
             # planner is done with all tasks, if there are still tasks to release, do so, else done
             if i_task < len(tasks):
-                next_curr_time = tasks[i_task][1]
+                next_curr_time = max(tasks[i_task][1], curr_time + comp_time)
             else:
                 stats['Status'] = 'Completed'
                 break
@@ -298,16 +301,16 @@ if __name__ == '__main__':
     # EnvironmentLib.create_benchmark_set_mp(n_processes=2)
 
     # Run a benchmark set (sequential)
-    # run_benchmark_set('BENCHMARK_20250407_085740')
+    # run_benchmark_set('All_instances')
 
     # Run a benchmark set (parallel)
-    # run_benchmark_set_parallel('BENCHMARK_20250407_085740', num_processes=3)
+    run_benchmark_set_parallel('BENCHMARK_20250407_085740', num_processes=3)
 
-    # Load, plot, run, and animate a single instance
+    # Load, plot, run, and animate an instance
     """
     g, agent_start, tasks = EnvironmentLib.load_instance_from_json(
-        'Benchmark_Sets/BENCHMARK_20250407_085740/sets/set_0/instance_38ad8a67-f3ad-458c-934d-5085d3fc0a08.json')
-    VisualiserLib.plot_graph(g, agent_start, 1)
+        'Benchmark_Sets/All_instances/sets/set_10/instance_e6bfd0a9-58cb-47b8-9e16-2fe9a3db6169.json')
+    # VisualiserLib.plot_graph(g, agent_start, 1)
     stats, planner = run_instance((g, agent_start, tasks), 1, 1)
     VisualiserLib.animate_MAPF(g, planner, 1, 1, 10, 10)
     """
