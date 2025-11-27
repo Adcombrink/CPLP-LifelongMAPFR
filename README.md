@@ -29,6 +29,16 @@ _This work addresses continuous-time lifelong MAPF with agent volumes by present
 
 <br>
 
+## Results
+
+The following results are updated since the original publication. Details can be found in [Advances in Multi-Agent Path Finding](https://research.chalmers.se/en/publication/549458).
+
+<div align="center">
+  <img width="50%" alt="Additional_Results_Combined_Metrics" src="https://github.com/user-attachments/assets/9b257a02-d637-4179-8c21-8c0300351138" />
+</div>
+
+<br>
+
 ## Repository Structure
 
 ```
