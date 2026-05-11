@@ -235,8 +235,10 @@ class GraphPreProcessor:
                     h_boundary_intersection = curr_v + t * direction
 
                 # determine which boundary line is intersected first, determining which cell is entered next
-                if v_boundary_intersection is not None and round(v_boundary_line[0][1], 6) <= round(
-                        v_boundary_intersection[1], 6) < round(v_boundary_line[0][1] + 1, 6):
+                if h_boundary_intersection is None or (
+                        v_boundary_intersection is not None and round(v_boundary_line[0][1], 6) <= round(
+                    v_boundary_intersection[1], 6) < round(v_boundary_line[0][1] + 1, 6)
+                ):
                     curr_v = v_boundary_intersection
                     curr_cell = (curr_cell[0] + 1 if direction[0] >= 0 else curr_cell[0] - 1, curr_cell[1])
                 else:
